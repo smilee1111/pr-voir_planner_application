@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "734861766366",
+    "project_id": "pr-voir",
+    "storage_bucket": "pr-voir.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734861766366:android:61e280cc2b60dd5a349c4f",
+        "android_client_info": {
+          "package_name": "com.example.pr_voir_planner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAASQUyu-UL8UkZ86KUz8vbmeA_LlsCb8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
