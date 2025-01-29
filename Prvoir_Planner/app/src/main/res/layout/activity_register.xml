@@ -1,64 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#7CB9C1"
     tools:context=".ui.activity.RegisterActivity">
 
     <EditText
         android:id="@+id/registerFname"
-        android:layout_width="239dp"
-        android:layout_height="67dp"
+        android:layout_width="226dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="61dp"
+        android:layout_marginEnd="135dp"
+        android:background="@drawable/login_res"
         android:ems="10"
         android:hint="Enter first name"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/registerLName"
-        android:layout_width="234dp"
-        android:layout_height="67dp"
+        android:layout_width="228dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginEnd="131dp"
+        android:background="@drawable/login_res"
         android:ems="10"
         android:hint="Enter last name"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerFname" />
 
     <EditText
         android:id="@+id/registerAddress"
-        android:layout_width="232dp"
-        android:layout_height="61dp"
+        android:layout_width="231dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="128dp"
+        android:background="@drawable/login_res"
         android:ems="10"
         android:hint="Enter address"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerLName" />
 
     <EditText
         android:id="@+id/registerContact"
-        android:layout_width="234dp"
-        android:layout_height="71dp"
+        android:layout_width="225dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="134dp"
+        android:background="@drawable/login_res"
         android:ems="10"
         android:hint="Enter phone number"
-        android:inputType="phone" />
+        android:inputType="phone"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerAddress" />
 
     <EditText
         android:id="@+id/registerEmail"
-        android:layout_width="234dp"
-        android:layout_height="57dp"
+        android:layout_width="227dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="132dp"
+        android:background="@drawable/login_res"
         android:ems="10"
         android:hint="Enter email"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerContact" />
 
     <EditText
         android:id="@+id/registerPassword"
-        android:layout_width="234dp"
-        android:layout_height="wrap_content"
+        android:layout_width="229dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="128dp"
+        android:background="@drawable/login_res"
         android:ems="10"
         android:hint="Enter password"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerEmail" />
 
     <Button
         android:id="@+id/signUp"
         android:layout_width="129dp"
         android:layout_height="67dp"
-        android:text="Sign up" />
-</LinearLayout>
+        android:layout_marginTop="38dp"
+        android:layout_marginEnd="230dp"
+        android:backgroundTint="#3FB2BD"
+        android:text="Sign Up"
+        android:textColor="#07464B"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerPassword" />
+
+    <TextView
+        android:id="@+id/btnAlogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="232dp"
+        android:text="Have an account?"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signUp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
