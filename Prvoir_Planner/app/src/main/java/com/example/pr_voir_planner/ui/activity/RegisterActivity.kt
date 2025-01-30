@@ -1,5 +1,6 @@
 package com.example.pr_voir_planner.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -85,6 +86,11 @@ class RegisterActivity : AppCompatActivity() {
 //                    }
 //
 //                }
+        }
+        binding.btnAlogin.setOnClickListener {
+            val intent = Intent(this@RegisterActivity,
+                LoginActivity::class.java)
+            startActivity(intent)
         }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

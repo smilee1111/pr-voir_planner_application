@@ -1,6 +1,7 @@
 package com.example.pr_voir_planner.repository
 
 import com.example.pr_voir_planner.model.UserModel
+import com.google.firebase.auth.FirebaseUser
 
 interface UserRepository {
 
