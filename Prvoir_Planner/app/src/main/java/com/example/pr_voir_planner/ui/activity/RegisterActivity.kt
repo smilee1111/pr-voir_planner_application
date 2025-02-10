@@ -14,84 +14,54 @@ import com.example.pr_voir_planner.repository.UserRepositoryImpl
 import com.example.pr_voir_planner.viewmodel.UserViewModel
 
 class RegisterActivity : AppCompatActivity() {
-    lateinit var binding:ActivityRegisterBinding
+    private lateinit var binding: ActivityRegisterBinding
+    private lateinit var userViewModel: UserViewModel
+    private lateinit var userRepository: UserRepositoryImpl
 
-
-    lateinit var userViewModel: UserViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding= ActivityRegisterBinding.inflate(layoutInflater)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var repo =UserRepositoryImpl()
-        userViewModel = UserViewModel(repo)
+
+        userRepository = UserRepositoryImpl()
+        userViewModel = UserViewModel(userRepository)
+
         binding.signUp.setOnClickListener {
-            var email =binding.registerEmail.text.toString()
-            var password =binding.registerPassword.text.toString()
-            var firstName =binding.registerFname.text.toString()
-            var lastName =binding.registerLName.text.toString()
-            var address =binding.registerAddress.text.toString()
-            var contact =binding.registerContact.text.toString()
+            val email = binding.registerEmail.text.toString().trim()
+            val password = binding.registerPassword.text.toString().trim()
+            val firstName = binding.registerFname.text.toString().trim()
+            val lastName = binding.registerLName.text.toString().trim()
+            val address = binding.registerAddress.text.toString().trim()
+            val contact = binding.registerContact.text.toString().trim()
 
-            userViewModel.signup(email,password){
-                    success,message,userId->
-                if(success){
-                    var userModel =UserModel(
-                        userId.toString()
-                        ,
-                        firstName, lastName, address, contact,email
-                    )
-                    userViewModel.addUserToDatabase(userId.toString(),userModel){
-                            success,message->
-                        if(success){
+            if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || address.isEmpty() || contact.isEmpty()) {
+                Toast.makeText(this, "All fields are required", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
 
-                        }else{
-
+            userViewModel.signup(email, password) { success, message, userId ->
+                if (success) {
+                    val userModel = UserModel(userId, firstName, lastName, address, contact, email)
+                    userViewModel.addUserToDatabase(userId, userModel) { dbSuccess, dbMessage ->
+                        if (dbSuccess) {
+                            Toast.makeText(this, "Registration successful", Toast.LENGTH_LONG).show()
+                            startActivity(Intent(this, LoginActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this, dbMessage, Toast.LENGTH_LONG).show()
                         }
                     }
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        message, Toast.LENGTH_LONG).show()
-                }else{
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        message, Toast.LENGTH_LONG
-                    ).show()
+                } else {
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 }
             }
-//            auth.createUserWithEmailAndPassword(email,password)
-//                .addOnCompleteListener {
-//                    if(it.isSuccessful){
-//                        var userId = auth.currentUser?.uid
-//
-//                        var userModel =UserModel(
-//                            userId.toString()
-//                            ,
-//                            firstName, lastName, address, contact,email
-//                        )
-//
-//                        ref.child(userId.toString()).setValue(userModel).addOnCompleteListener {
-//                            if(it.isSuccessful){
-//                                Toast.makeText(this@RegisterActivity,
-//                                    "Register Success",Toast.LENGTH_LONG)
-//                                    .show()
-//                            }else{
-//                                Toast.makeText(this@RegisterActivity, it.exception?.message.toString(),
-//                                    Toast.LENGTH_LONG).show()
-//                            }
-//                            }t
-//                        }else{
-//                        Toast.makeText(this@RegisterActivity, it.exception?.message.toString(),
-//                            Toast.LENGTH_LONG).show()
-//                    }
-//
-//                }
         }
+
         binding.btnAlogin.setOnClickListener {
-            val intent = Intent(this@RegisterActivity,
-                LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
         }
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
