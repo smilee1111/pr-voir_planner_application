@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pr_voir_planner.R
@@ -42,12 +44,47 @@ class TaskFragment : Fragment() {
 
         // Set up Add Task Button click listener
         addTaskButton.setOnClickListener {
-            // Open a new activity or fragment to add a task
-            // For now, this will be a simple action
-            taskList.add(Task("New Task", "Task description", "Medium", "2025-02-28 11:00 AM", "To-Do"))
-            taskAdapter.notifyDataSetChanged()  // Refresh the RecyclerView
+            showAddTaskDialog()
         }
 
         return view
+    }
+
+    // Function to show the Add Task Dialog
+    private fun showAddTaskDialog() {
+        // Inflate the dialog view
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_task, null)
+
+        // Get references to the input fields
+        val taskTitleEditText = dialogView.findViewById<EditText>(R.id.editTaskTitle)
+        val taskDescriptionEditText = dialogView.findViewById<EditText>(R.id.editTaskDescription)
+        val taskPriorityEditText = dialogView.findViewById<EditText>(R.id.editTaskPriority)
+        val taskDueTimeEditText = dialogView.findViewById<EditText>(R.id.editTaskDueTime)
+        val taskStatusEditText = dialogView.findViewById<EditText>(R.id.editTaskStatus)
+
+        // Build the dialog
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Add New Task")
+            .setView(dialogView)
+            .setPositiveButton("Add") { _, _ ->
+                // Get the data from the input fields
+                val title = taskTitleEditText.text.toString()
+                val description = taskDescriptionEditText.text.toString()
+                val priority = taskPriorityEditText.text.toString()
+                val dueTime = taskDueTimeEditText.text.toString()
+                val status = taskStatusEditText.text.toString()
+
+                // Create a new Task and add it to the list
+                val newTask = Task(title, description, priority, dueTime, status)
+                taskList.add(newTask)
+
+                // Notify the adapter that a new item was inserted
+                taskAdapter.notifyItemInserted(taskList.size - 1)
+            }
+            .setNegativeButton("Cancel", null) // Dismiss the dialog if canceled
+            .create()
+
+        // Show the dialog
+        dialog.show()
     }
 }
