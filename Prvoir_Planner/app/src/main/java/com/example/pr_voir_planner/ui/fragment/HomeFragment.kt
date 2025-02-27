@@ -6,9 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.pr_voir_planner.R
 import com.example.pr_voir_planner.databinding.FragmentHomeBinding
-import com.example.pr_voir_planner.ui.adapter.EventAdapter
+import com.example.pr_voir_planner.ui.adapter.DashboardAdapter
 
 class HomeFragment : Fragment() {
 
@@ -33,7 +32,7 @@ class HomeFragment : Fragment() {
 
         // Set up RecyclerView
         binding.rvEvents.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvEvents.adapter = EventAdapter(getDummyEvents())
+        binding.rvEvents.adapter = DashboardAdapter(getDummyEvents())
 
         // FAB Click Action
         binding.fabAdd.setOnClickListener {
