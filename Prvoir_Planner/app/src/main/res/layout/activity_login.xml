@@ -20,16 +20,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/login" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="78dp"
-        android:layout_height="62dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="332dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/planner" />
-
     <EditText
         android:id="@+id/editEmail"
         android:layout_width="246dp"
