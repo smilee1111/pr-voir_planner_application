@@ -5,26 +5,34 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <EditText
         android:id="@+id/eventTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event Title"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:hint="Event Title" />
 
-    <TextView
+    <EditText
         android:id="@+id/eventLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event Location"
-        android:textSize="14sp" />
+        android:hint="Location" />
 
-    <TextView
+    <TimePicker
         android:id="@+id/eventTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Event Time"
-        android:textSize="14sp" />
+        android:timePickerMode="spinner" />
+
+    <!-- Add Save Button -->
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Event"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center"
+        android:padding="12dp"/>
 
 </LinearLayout>
