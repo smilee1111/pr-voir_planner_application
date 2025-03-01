@@ -14,6 +14,7 @@ import com.example.pr_voir_planner.R
 import com.example.pr_voir_planner.adapter.EventAdapter
 import com.example.pr_voir_planner.model.EventModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class ScheduleFragment : Fragment() {
@@ -63,13 +64,21 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun loadEvents(date: String) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId == null) {
+            Log.e("ScheduleFragment", "User not logged in")
+            return
+        }
+
         database.orderByChild("date").equalTo(date).addListenerForSingleValueEvent(object :
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 eventList.clear()
                 for (eventSnapshot in snapshot.children) {
                     val event = eventSnapshot.getValue(EventModel::class.java)
-                    event?.let { eventList.add(it) }
+                    if (event != null && event.userId == currentUserId) { // Filter by userId
+                        eventList.add(event)
+                    }
                 }
                 eventAdapter.notifyDataSetChanged() // Refresh the RecyclerView
             }
@@ -79,6 +88,7 @@ class ScheduleFragment : Fragment() {
             }
         })
     }
+
     override fun onResume() {
         super.onResume()
         loadEvents(selectedDate) // Reload events when returning to the fragment
@@ -86,12 +96,19 @@ class ScheduleFragment : Fragment() {
 
 
     private fun saveEventToFirebase(event: EventModel) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId == null) {
+            Log.e("ScheduleFragment", "User not logged in")
+            return
+        }
+
         val eventId = database.push().key ?: return
-        val eventWithId = event.copy(eventId = eventId) // ✅ Set eventId correctly
+        val eventWithId = event.copy(eventId = eventId, userId = currentUserId) // Set eventId & userId
 
         database.child(eventId).setValue(eventWithId)
             .addOnSuccessListener { loadEvents(event.date) }
             .addOnFailureListener { Log.e("Firebase", "Failed to save event") }
     }
+
 
 }
