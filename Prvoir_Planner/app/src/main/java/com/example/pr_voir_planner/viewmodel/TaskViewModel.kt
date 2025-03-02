@@ -1,0 +1,20 @@
+package com.example.pr_voir_planner.viewmodel
+
+import androidx.lifecycle.ViewModel
+import com.example.pr_voir_planner.model.TaskModel
+import com.example.pr_voir_planner.repository.TaskRepository
+
+class TaskViewModel(private val repo: TaskRepository) : ViewModel() {
+
+    fun addTask(task: TaskModel, callback: (Boolean, String) -> Unit) {
+        repo.addTask(task, callback)
+    }
+
+    fun getTasksForUserAndDate(userId: String, date: String, callback: (Boolean, List<TaskModel>?, String) -> Unit) {
+        repo.getTasksForUserAndDate(userId, date, callback)
+    }
+
+    fun deleteTask(taskId: String, callback: (Boolean, String) -> Unit) {
+        repo.deleteTask(taskId, callback)
+    }
+}

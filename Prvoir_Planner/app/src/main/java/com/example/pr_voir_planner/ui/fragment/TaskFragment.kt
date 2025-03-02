@@ -1,60 +1,108 @@
 package com.example.pr_voir_planner.ui.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CalendarView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.pr_voir_planner.R
+import com.example.pr_voir_planner.adapter.TaskAdapter
+import com.example.pr_voir_planner.model.TaskModel
+import com.example.pr_voir_planner.ui.dialog.AddTaskDialog
+import com.example.pr_voir_planner.viewmodel.TaskViewModel
+import com.example.pr_voir_planner.viewmodel.TaskViewModelFactory
+import com.example.pr_voir_planner.repository.TaskRepositoryImpl
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TaskFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TaskFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var taskViewModel: TaskViewModel
+    private lateinit var calendarView: CalendarView
+    private lateinit var taskRecyclerView: RecyclerView
+    private lateinit var addTaskFab: FloatingActionButton
+    private lateinit var taskAdapter: TaskAdapter
+    private val taskList = mutableListOf<TaskModel>()
+
+    private var selectedDate: String = ""
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_task, container, false)
-    }
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_task, container, false)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment TaskFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TaskFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        calendarView = view.findViewById(R.id.taskCalendarView)
+        taskRecyclerView = view.findViewById(R.id.taskRecyclerView)
+        addTaskFab = view.findViewById(R.id.addTaskFab)
+
+        // Initialize TaskRepository
+        val taskRepository = TaskRepositoryImpl()
+        // Use TaskViewModelFactory to create the ViewModel instance
+        taskViewModel = ViewModelProvider(
+            this,
+            TaskViewModelFactory(taskRepository)
+        ).get(TaskViewModel::class.java)
+
+        taskAdapter = TaskAdapter(taskList)
+        taskRecyclerView.adapter = taskAdapter
+        taskRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Initialize selectedDate with the current date
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedDate = "$year-${month + 1}-$dayOfMonth" // Format: YYYY-MM-DD
+
+        // Set the calendar to the current date
+        calendarView.date = calendar.timeInMillis
+
+        // Load tasks for the current date
+        loadTasksForDate(selectedDate)
+
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            selectedDate = "$year-${month + 1}-$dayOfMonth" // Format: YYYY-MM-DD
+            loadTasksForDate(selectedDate)
+        }
+
+        addTaskFab.setOnClickListener {
+            val dialog = AddTaskDialog(selectedDate) { task ->
+                taskViewModel.addTask(task) { success, message ->
+                    if (success) {
+                        // Reload tasks for the selected date after adding a new task
+                        loadTasksForDate(selectedDate)
+                    }
                 }
             }
+            dialog.show(childFragmentManager, "AddTaskDialog")
+        }
+
+        return view
+    }
+
+    private fun loadTasksForDate(date: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            // Handle the case where the user is not authenticated
+            return
+        }
+
+        taskViewModel.getTasksForUserAndDate(userId, date) { success, tasks, message ->
+            if (success) {
+                taskList.clear()
+                taskList.addAll(tasks ?: emptyList())
+                taskAdapter.notifyDataSetChanged() // Notify the adapter of data changes
+            } else {
+                (Toast.makeText(requireContext(), "Failed to load tasks: $message", Toast.LENGTH_SHORT).show())
+                // Handle the error (e.g., show a Toast message)
+            }
+        }
     }
 }
