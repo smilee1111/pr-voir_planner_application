@@ -1,14 +1,16 @@
 package com.example.pr_voir_planner.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.pr_voir_planner.R
 import com.example.pr_voir_planner.databinding.FragmentProfileBinding
 import com.example.pr_voir_planner.repository.UserRepositoryImpl
+import com.example.pr_voir_planner.ui.activity.LoginActivity
 import com.example.pr_voir_planner.viewmodel.UserViewModel
 import com.example.pr_voir_planner.viewmodel.UserViewModelFactory
 
@@ -29,53 +31,55 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.buttonLogout.setOnClickListener {
+            userViewModel.logout()
+
+            // Create an intent to navigate to the LoginActivity
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+
+            // Clear the back stack so the user cannot go back to the profile screen
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+            // Start the LoginActivity
+            startActivity(intent)
+
+            // Close the current activity
+            requireActivity().finish()
+        }
 
         // Initialize ViewModel
-        val userRepository = UserRepositoryImpl() // Create repository instance
-        val viewModelFactory = UserViewModelFactory(userRepository) // Create factory
+        val userRepository = UserRepositoryImpl()
+        val viewModelFactory = UserViewModelFactory(userRepository)
         userViewModel = ViewModelProvider(this, viewModelFactory).get(UserViewModel::class.java)
 
         // Fetch current user ID
         val userId = userViewModel.getCurrentUser()?.uid
         if (userId != null) {
-            // Fetch user data from Firebase
+            Log.d("ProfileFragment", "Fetching tasks for userId: $userId")
             userViewModel.getUserData(userId) { userModel ->
                 if (userModel != null) {
-                    // Update UI with user's name
+
+
+                    binding.textViewWelcome.text = "Welcome, ${userModel.firstName}!"
                     binding.textViewFirstName.text = userModel.firstName
                     binding.textViewLastName.text = userModel.lastName
-
-                    // Fetch tasks for the user
-                    userViewModel.getTasksForUser(userId) { tasks ->
-                        // Calculate progress
-                        val totalTasks = tasks.size
-                        val completedTasks = tasks.count { it.status == "Done" }
-
-                        // Update progress bar and percentage
-                        val progress = if (totalTasks > 0) {
-                            (completedTasks.toFloat() / totalTasks.toFloat()) * 100
-                        } else {
-                            0f
-                        }
-                        binding.progressBar.progress = progress.toInt()
-                        binding.textViewProgressPercentage.text = "${progress.toInt()}%"
-                    }
+                    binding.textViewEmail.text = "Email: ${userModel.email}"
+                    binding.textViewContact.text = "Contact: ${userModel.contact}"
+                    binding.textViewAddress.text = "Address: ${userModel.address}"
                 } else {
-                    // Handle error (e.g., user data not found)
                     binding.textViewFirstName.text = "User not found"
                     binding.textViewLastName.text = ""
-                    binding.progressBar.progress = 0
-                    binding.textViewProgressPercentage.text = "0%"
+                    binding.textViewEmail.text = "Email: N/A"
+                    binding.textViewContact.text = "Contact: N/A"
+                    binding.textViewAddress.text = "Address: N/A"
                 }
             }
         } else {
-            // Handle error (e.g., user not logged in)
             binding.textViewFirstName.text = "Not logged in"
             binding.textViewLastName.text = ""
-            binding.progressBar.progress = 0
-            binding.textViewProgressPercentage.text = "0%"
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

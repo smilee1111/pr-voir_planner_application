@@ -10,6 +10,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class UserRepositoryImpl : UserRepository {
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -18,29 +21,7 @@ class UserRepositoryImpl : UserRepository {
     private var ref: DatabaseReference = database.reference.child("users")
     private var tasksRef: DatabaseReference = database.reference.child("tasks")
 
-    // Existing functions...
 
-    override fun getTasksForUser(userId: String, callback: (List<TaskModel>) -> Unit) {
-        tasksRef.orderByChild("userId").equalTo(userId)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d("UserRepositoryImpl", "Tasks snapshot: $snapshot")
-                    val tasks = mutableListOf<TaskModel>()
-                    for (taskSnapshot in snapshot.children) {
-                        val task = taskSnapshot.getValue(TaskModel::class.java)
-                        if (task != null) {
-                            tasks.add(task)
-                        }
-                    }
-                    callback(tasks)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("UserRepositoryImpl", "Error fetching tasks: ${error.message}")
-                    callback(emptyList())
-                }
-            })
-    }
     override fun getUserData(userId: String, callback: (UserModel?) -> Unit) {
         ref.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

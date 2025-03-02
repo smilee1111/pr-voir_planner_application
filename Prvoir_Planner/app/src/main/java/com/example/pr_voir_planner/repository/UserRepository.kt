@@ -10,7 +10,6 @@ interface UserRepository {
     fun addUserToDatabase(userId: String, userModel: UserModel, callback: (Boolean, String) -> Unit)
     fun forgetPassword(email: String, callback: (Boolean, String) -> Unit)
     fun getCurrentUser(): FirebaseUser?
-    fun getUserData(userId: String, callback: (UserModel?) -> Unit) // NEW FUNCTION
-    fun getTasksForUser(userId: String, callback: (List<TaskModel>) -> Unit) // NEW FUNCTION
+    fun getUserData(userId: String, callback: (UserModel?) -> Unit)
     fun logout(callback: (Boolean, String) -> Unit) // NEW FUNCTION
 }

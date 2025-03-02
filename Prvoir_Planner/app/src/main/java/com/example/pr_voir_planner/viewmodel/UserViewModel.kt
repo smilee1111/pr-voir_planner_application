@@ -24,10 +24,12 @@ class UserViewModel(private val repo: UserRepository) : ViewModel() { // Made re
     fun forgetPassword(email: String, callback: (Boolean, String) -> Unit) {
         repo.forgetPassword(email, callback)
     }
-    fun getTasksForUser(userId: String, callback: (List<TaskModel>) -> Unit) {
-        repo.getTasksForUser(userId, callback)
-    }
+
     fun getCurrentUser(): FirebaseUser? {
         return repo.getCurrentUser()
+    }
+
+    fun logout() {
+        TODO("Not yet implemented")
     }
 }
