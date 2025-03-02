@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding= ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var repo =UserRepositoryImpl()
+        var repo =UserRepositoryImpl(this)
         userViewModel = UserViewModel(repo)
         binding.btnLogin.setOnClickListener {
             var email =binding.editEmail.text.toString()
@@ -50,4 +50,11 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
     }
+    // In LoginActivity
+    override fun onResume() {
+        super.onResume()
+        binding.editEmail.text.clear() // Clear the email field
+        binding.editPassword.text.clear() // Clear the password field
+    }
+
 }

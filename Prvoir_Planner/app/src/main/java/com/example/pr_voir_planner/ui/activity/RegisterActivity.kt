@@ -24,7 +24,7 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        userRepository = UserRepositoryImpl()
+        userRepository = UserRepositoryImpl(this)
         userViewModel = UserViewModel(userRepository)
 
         binding.signUp.setOnClickListener {

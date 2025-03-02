@@ -1,5 +1,6 @@
 package com.example.pr_voir_planner.repository
 
+import android.content.Context
 import android.util.Log
 import com.example.pr_voir_planner.model.TaskModel
 import com.example.pr_voir_planner.model.UserModel
@@ -14,7 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class UserRepositoryImpl : UserRepository {
+class UserRepositoryImpl(private val context: Context) : UserRepository {
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -81,11 +82,30 @@ class UserRepositoryImpl : UserRepository {
     }
 
     override fun logout(callback: (Boolean, String) -> Unit) {
+        // Sign out from Firebase Auth
         auth.signOut()
+
+        // Clear stored credentials (email and password) from SharedPreferences
+        clearStoredCredentials()
+
+        // Check if the user is logged out
         if (auth.currentUser == null) {
             callback(true, "Logout successful")
         } else {
             callback(false, "Logout failed")
         }
+    }
+
+    // Method to clear stored credentials from SharedPreferences
+    private fun clearStoredCredentials() {
+        val sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // Remove email and password (or any other credentials you store)
+        editor.remove("email")
+        editor.remove("password")
+
+        // Apply changes
+        editor.apply()
     }
 }

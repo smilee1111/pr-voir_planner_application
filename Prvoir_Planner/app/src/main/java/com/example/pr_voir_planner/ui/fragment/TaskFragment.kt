@@ -78,6 +78,8 @@ class TaskFragment : Fragment() {
                     if (success) {
                         // Reload tasks for the selected date after adding a new task
                         loadTasksForDate(selectedDate)
+                    } else {
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -90,7 +92,7 @@ class TaskFragment : Fragment() {
     private fun loadTasksForDate(date: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
-            // Handle the case where the user is not authenticated
+            Toast.makeText(requireContext(), "User not authenticated", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -100,8 +102,7 @@ class TaskFragment : Fragment() {
                 taskList.addAll(tasks ?: emptyList())
                 taskAdapter.notifyDataSetChanged() // Notify the adapter of data changes
             } else {
-                (Toast.makeText(requireContext(), "Failed to load tasks: $message", Toast.LENGTH_SHORT).show())
-                // Handle the error (e.g., show a Toast message)
+                Toast.makeText(requireContext(), "Failed to load tasks: $message", Toast.LENGTH_SHORT).show()
             }
         }
     }

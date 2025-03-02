@@ -1,60 +1,108 @@
 package com.example.pr_voir_planner.ui.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.pr_voir_planner.R
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.pr_voir_planner.databinding.FragmentHomeBinding
+import com.example.pr_voir_planner.model.TaskModel
+import com.example.pr_voir_planner.model.UserModel
+import com.example.pr_voir_planner.repository.TaskRepositoryImpl
+import com.example.pr_voir_planner.repository.UserRepositoryImpl
+import com.example.pr_voir_planner.ui.adapter.DashboardAdapter
+import com.example.pr_voir_planner.viewmodel.TaskViewModel
+import com.example.pr_voir_planner.viewmodel.TaskViewModelFactory
+import com.example.pr_voir_planner.viewmodel.UserViewModel
+import com.example.pr_voir_planner.viewmodel.UserViewModelFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var dashboardAdapter: DashboardAdapter
+    private lateinit var taskViewModel: TaskViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Initialize Task ViewModel
+        val taskRepository = TaskRepositoryImpl()
+        val taskViewModelFactory = TaskViewModelFactory(taskRepository)
+        taskViewModel = ViewModelProvider(this, taskViewModelFactory).get(TaskViewModel::class.java)
+
+        // Initialize User ViewModel
+        val userRepository = UserRepositoryImpl(requireContext())
+        val userViewModelFactory = UserViewModelFactory(requireContext(),userRepository)
+        userViewModel = ViewModelProvider(this, userViewModelFactory).get(UserViewModel::class.java)
+
+        // Set up RecyclerView
+        dashboardAdapter = DashboardAdapter(emptyList())
+        binding.recyclerViewTasks.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewTasks.adapter = dashboardAdapter
+
+        // Fetch and display the current user's name
+        fetchCurrentUserName()
+
+        // Fetch tasks for the current user
+        fetchTasks()
+    }
+
+    private fun fetchCurrentUserName() {
+        val userId = taskViewModel.getCurrentUser()?.uid
+        if (userId != null) {
+            userViewModel.getUserData(userId) { userModel ->
+                if (userModel != null) {
+                    // Update the greeting message with the user's first name
+                    binding.textViewGreeting.text = "Good Morning, ${userModel.firstName}!"
+                } else {
+                    binding.textViewGreeting.text = "Good Morning, User!"
                 }
             }
+        } else {
+            binding.textViewGreeting.text = "Good Morning, User!"
+        }
+    }
+
+    private fun fetchTasks() {
+        val userId = taskViewModel.getCurrentUser()?.uid
+        if (userId != null) {
+            taskViewModel.getTasksForUser(userId).observe(viewLifecycleOwner) { tasks ->
+                if (tasks != null) {
+                    // Update RecyclerView with real data
+                    dashboardAdapter = DashboardAdapter(tasks)
+                    binding.recyclerViewTasks.adapter = dashboardAdapter
+
+                    // Update progress
+                    updateProgress(tasks)
+                }
+            }
+        }
+    }
+
+    private fun updateProgress(tasks: List<TaskModel>) {
+        val totalTasks = tasks.size
+        val completedTasks = tasks.count { it.status == "Done" }
+        val progress = if (totalTasks > 0) (completedTasks.toFloat() / totalTasks) * 100 else 0
+
+        binding.textViewProgress.text = "Progress: ${progress.toInt()}%"
+        binding.progressBar.progress = progress.toInt()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

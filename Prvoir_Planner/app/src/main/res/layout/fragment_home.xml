@@ -31,28 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Quick Actions -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/buttonAddTask"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Add Task"
-            android:layout_marginEnd="8dp"/>
-
-        <Button
-            android:id="@+id/buttonViewAllTasks"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="View All Tasks"/>
-    </LinearLayout>
 
     <!-- Task Progress -->
     <TextView

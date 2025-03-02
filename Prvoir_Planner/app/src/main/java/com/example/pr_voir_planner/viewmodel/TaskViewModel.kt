@@ -1,8 +1,10 @@
 package com.example.pr_voir_planner.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.pr_voir_planner.model.TaskModel
 import com.example.pr_voir_planner.repository.TaskRepository
+import com.google.android.gms.tasks.Task
 
 class TaskViewModel(private val repo: TaskRepository) : ViewModel() {
 
@@ -14,6 +16,11 @@ class TaskViewModel(private val repo: TaskRepository) : ViewModel() {
         repo.getTasksForUserAndDate(userId, date, callback)
     }
 
+    fun getTasksForUser(userId: String): LiveData<List<TaskModel>> {
+        return repo.getTasksForUser(userId)
+    }
+
+    fun getCurrentUser() = repo.getCurrentUser()
     fun deleteTask(taskId: String, callback: (Boolean, String) -> Unit) {
         repo.deleteTask(taskId, callback)
     }

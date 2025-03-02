@@ -29,7 +29,8 @@ class UserViewModel(private val repo: UserRepository) : ViewModel() { // Made re
         return repo.getCurrentUser()
     }
 
-    fun logout() {
-        TODO("Not yet implemented")
+    fun logout(callback: (Boolean, String) -> Unit) {
+        // Pass the callback to the repository's logout method
+        repo.logout(callback)
     }
 }

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.pr_voir_planner.databinding.FragmentProfileBinding
@@ -31,25 +32,27 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Initialize ViewModel
+        val userRepository = UserRepositoryImpl(requireContext())
+        val viewModelFactory = UserViewModelFactory(requireContext(),userRepository)
+        userViewModel = ViewModelProvider(this, viewModelFactory).get(UserViewModel::class.java)
+
         binding.buttonLogout.setOnClickListener {
-            userViewModel.logout()
-
-            // Create an intent to navigate to the LoginActivity
-            val intent = Intent(requireContext(), LoginActivity::class.java)
-
-            // Clear the back stack so the user cannot go back to the profile screen
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-            // Start the LoginActivity
-            startActivity(intent)
-
-            // Close the current activity
-            requireActivity().finish()
+            userViewModel.logout { success, message ->
+                // Handle the logout result here
+                if (success) {
+                    // Navigate to the login screen or show a success message
+                    val intent = Intent(requireContext(), LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    requireActivity().finish()
+                } else {
+                    // Handle failure (e.g., show a toast or log the error message)
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
-        // Initialize ViewModel
-        val userRepository = UserRepositoryImpl()
-        val viewModelFactory = UserViewModelFactory(userRepository)
         userViewModel = ViewModelProvider(this, viewModelFactory).get(UserViewModel::class.java)
 
         // Fetch current user ID
