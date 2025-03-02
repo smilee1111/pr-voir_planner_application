@@ -8,4 +8,5 @@ interface EventRepository {
     fun addEvent(event: EventModel, callback: (Boolean, String) -> Unit)
     fun getEventsForUser(userId: String, callback: (Boolean, List<EventModel>?, String) -> Unit)
     fun deleteEvent(eventId: String, callback: (Boolean, String) -> Unit)
+    fun updateEvent(event: EventModel, callback: (Boolean, String) -> Unit) // Added
 }

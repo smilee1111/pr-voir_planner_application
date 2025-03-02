@@ -77,5 +77,33 @@
                 android:textSize="14sp"
                 android:textColor="@color/accent" />
         </LinearLayout>
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <!-- Edit Button -->
+            <ImageButton
+                android:id="@+id/buttonEditEvent"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:background="@drawable/button_icon_background"
+                android:contentDescription="Edit Event"
+                android:layout_marginEnd="8dp"
+                app:tint="@color/primary" />
+
+            <!-- Delete Button -->
+            <ImageButton
+                android:id="@+id/buttonDeleteEvent"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:background="@drawable/button_icon_background"
+                android:contentDescription="Delete Event"
+                app:tint="@color/error" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

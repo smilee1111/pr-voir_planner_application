@@ -42,8 +42,15 @@ class ScheduleFragment : Fragment() {
         // Initialize Firebase Database
         database = FirebaseDatabase.getInstance().getReference("Events")
 
-        // Setup RecyclerView
-        eventAdapter = EventAdapter(eventList)
+        // Setup RecyclerView with edit and delete callbacks
+        eventAdapter = EventAdapter(eventList,
+            onEditClick = { event ->
+                editEvent(event)
+            },
+            onDeleteClick = { event ->
+                deleteEvent(event)
+            }
+        )
         eventRecyclerView.adapter = eventAdapter
         eventRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -60,7 +67,7 @@ class ScheduleFragment : Fragment() {
 
         // Handle FAB click to add event
         addEventFab.setOnClickListener {
-            val dialog = AddEventDialog(selectedDate) { event ->
+            val dialog = AddEventDialog(selectedDate, null) { event ->
                 saveEventToFirebase(event)
             }
             dialog.show(childFragmentManager, "AddEventDialog")
@@ -125,6 +132,57 @@ class ScheduleFragment : Fragment() {
             }
             .addOnFailureListener { e ->
                 Log.e("Firebase", "Failed to save event: ${e.message}")
+            }
+    }
+
+    private fun editEvent(event: EventModel) {
+        val dialog = AddEventDialog(selectedDate, event) { updatedEvent ->
+            updateEventInFirebase(updatedEvent)
+        }
+        dialog.show(childFragmentManager, "EditEventDialog")
+    }
+
+    private fun updateEventInFirebase(event: EventModel) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId == null) {
+            Log.e("ScheduleFragment", "User not logged in")
+            return
+        }
+
+        if (event.eventId.isEmpty()) {
+            Log.e("ScheduleFragment", "Event ID is missing")
+            return
+        }
+
+        database.child(event.eventId).setValue(event)
+            .addOnSuccessListener {
+                Log.d("Firebase", "Event updated successfully")
+                loadEvents(event.date) // Reload events after updating
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Failed to update event: ${e.message}")
+            }
+    }
+
+    private fun deleteEvent(event: EventModel) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId == null) {
+            Log.e("ScheduleFragment", "User not logged in")
+            return
+        }
+
+        if (event.eventId.isEmpty()) {
+            Log.e("ScheduleFragment", "Event ID is missing")
+            return
+        }
+
+        database.child(event.eventId).removeValue()
+            .addOnSuccessListener {
+                Log.d("Firebase", "Event deleted successfully")
+                loadEvents(event.date) // Reload events after deletion
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Failed to delete event: ${e.message}")
             }
     }
 }

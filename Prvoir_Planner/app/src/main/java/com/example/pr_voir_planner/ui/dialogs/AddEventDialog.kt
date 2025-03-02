@@ -8,7 +8,11 @@ import com.example.pr_voir_planner.databinding.FragmentAddEventDialogBinding
 import com.example.pr_voir_planner.model.EventModel
 import com.google.firebase.auth.FirebaseAuth
 
-class AddEventDialog(private val selectedDate: String, private val onEventAdded: (EventModel) -> Unit) : DialogFragment() {
+class AddEventDialog(
+    private val selectedDate: String,
+    private val eventToEdit: EventModel? = null, // Optional parameter for editing
+    private val onEventAdded: (EventModel) -> Unit
+) : DialogFragment() {
 
     private lateinit var binding: FragmentAddEventDialogBinding
 
@@ -16,7 +20,6 @@ class AddEventDialog(private val selectedDate: String, private val onEventAdded:
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout using the generated binding class
         binding = FragmentAddEventDialogBinding.inflate(inflater, container, false)
 
         // Bind UI components
@@ -24,14 +27,26 @@ class AddEventDialog(private val selectedDate: String, private val onEventAdded:
         val locationEditText = binding.eventLocation
         val timePicker = binding.eventTime
 
+        // Pre-fill fields if editing an existing event
+        eventToEdit?.let { event ->
+            titleEditText.setText(event.title)
+            locationEditText.setText(event.location)
+            val timeParts = event.time.split(":")
+            if (timeParts.size == 2) {
+                timePicker.hour = timeParts[0].toInt()
+                timePicker.minute = timeParts[1].toInt()
+            }
+        }
+
         // Set save button listener
         binding.saveButton.setOnClickListener {
             val title = titleEditText.text.toString()
             val location = locationEditText.text.toString()
             val time = "${timePicker.hour}:${timePicker.minute}"
 
-            // Create EventModel object
+            // Create or update EventModel object
             val event = EventModel(
+                eventId = eventToEdit?.eventId ?: "", // Preserve eventId if editing
                 title = title,
                 location = location,
                 date = selectedDate,

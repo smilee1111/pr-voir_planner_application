@@ -45,4 +45,22 @@ class EventRepositoryImpl : EventRepository {
                 callback(false, e.message ?: "Failed to delete event")
             }
     }
+    override fun updateEvent(event: EventModel, callback: (Boolean, String) -> Unit) {
+        val eventId = event.eventId ?: return callback(false, "Event ID is missing")
+        val userId = auth.currentUser?.uid ?: return callback(false, "User not authenticated")
+
+        // Ensure userId matches the current user for security
+        if (event.userId != userId) {
+            return callback(false, "Unauthorized to update this event")
+        }
+
+        db.collection("events").document(eventId)
+            .set(event) // Overwrites the existing document
+            .addOnSuccessListener {
+                callback(true, "Event updated successfully")
+            }
+            .addOnFailureListener { e ->
+                callback(false, e.message ?: "Failed to update event")
+            }
+    }
 }

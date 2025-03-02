@@ -36,7 +36,9 @@ class ProfileFragment : Fragment() {
         val userRepository = UserRepositoryImpl(requireContext())
         val viewModelFactory = UserViewModelFactory(requireContext(),userRepository)
         userViewModel = ViewModelProvider(this, viewModelFactory).get(UserViewModel::class.java)
+        binding.buttonEditProfile.setOnClickListener{
 
+        }
         binding.buttonLogout.setOnClickListener {
             userViewModel.logout { success, message ->
                 // Handle the logout result here
