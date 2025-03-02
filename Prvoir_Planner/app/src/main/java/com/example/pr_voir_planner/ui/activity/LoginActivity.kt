@@ -53,8 +53,8 @@ class LoginActivity : AppCompatActivity() {
     // In LoginActivity
     override fun onResume() {
         super.onResume()
-        binding.editEmail.text.clear() // Clear the email field
-        binding.editPassword.text.clear() // Clear the password field
+        binding.editEmail?.text?.clear() // Clear the email field
+        binding.editPassword?.text?.clear() // Clear the password field
     }
 
 }
