@@ -4,7 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="?android:attr/selectableItemBackground"
+    android:background="@color/card_background"
+    android:elevation="4dp"
+    android:clipToPadding="false"
+    android:layout_margin="8dp"
     android:clickable="true"
     android:focusable="true">
 
@@ -14,8 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Task Title"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:paddingBottom="8dp" />
 
     <!-- Task Description -->
     <TextView
@@ -23,43 +28,72 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Task Description"
-        android:textSize="14sp"
-        android:lineSpacingExtra="2dp" />
+        android:textSize="16sp"
+        android:textColor="@color/text_secondary"
+        android:lineSpacingExtra="4dp"
+        android:paddingBottom="12dp" />
 
-    <!-- Task Due Date and Time -->
-    <TextView
-        android:id="@+id/taskDate"
+    <!-- Date and Time Container -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Due Date and Time"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray" />
-    <TextView
-        android:id="@+id/taskTime"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
+
+        <!-- Task Due Date -->
+        <TextView
+            android:id="@+id/taskDate"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Due Date"
+            android:textSize="14sp"
+            android:textColor="@color/blue"
+            android:drawablePadding="4dp"
+            android:drawableStart="@android:drawable/ic_menu_my_calendar" />
+
+        <!-- Task Time -->
+        <TextView
+            android:id="@+id/taskTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="14sp"
+            android:textColor="@color/blue"
+            android:drawablePadding="4dp"
+            android:drawableStart="@android:drawable/ic_menu_recent_history" />
+    </LinearLayout>
+
+    <!-- Status and Priority Container -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Due Date and Time"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <!-- Task Status -->
-    <TextView
-        android:id="@+id/taskStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Status"
-        android:textSize="14sp"
-        android:textColor="@android:color/holo_blue_dark" />
+        <!-- Task Status -->
+        <TextView
+            android:id="@+id/taskStatus"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Status"
+            android:textSize="14sp"
+            android:textColor="@color/primary_light"
+            android:background="@drawable/status_background"
+            android:padding="6dp"
+            android:layout_marginEnd="8dp" />
 
-    <!-- Task Priority -->
-    <TextView
-        android:id="@+id/taskPriority"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Priority"
-        android:textSize="14sp"
-        android:textColor="@android:color/holo_green_dark" />
-
-
+        <!-- Task Priority -->
+        <TextView
+            android:id="@+id/taskPriority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Priority"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:background="@drawable/status_background"
+            android:padding="6dp" />
+    </LinearLayout>
 
 </LinearLayout>
