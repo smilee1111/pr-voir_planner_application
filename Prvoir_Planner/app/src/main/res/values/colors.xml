@@ -25,4 +25,8 @@
     <!-- Additional colors -->
     <color name="error">#F44336</color>
     <color name="success">#4CAF50</color>
+    <!-- New priority colors -->
+    <color name="priority_high">#F44336</color> <!-- Red -->
+    <color name="priority_medium">#FFCA28</color> <!-- Yellow -->
+    <color name="priority_low">#4CAF50</color> <!-- Green -->
 </resources>

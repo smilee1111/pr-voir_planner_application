@@ -50,7 +50,7 @@
                     android:id="@+id/textViewUpcomingTasks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Upcoming Tasks"
+                    android:text="Your Tasks"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
