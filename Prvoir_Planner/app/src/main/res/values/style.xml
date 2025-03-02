@@ -9,6 +9,9 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">16sp</item>
     </style>
+    <style name="Theme.Prvoir_Planner.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize as needed -->
+    </style>
     <style name="TimePickerTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/primary</item> <!-- #3FB2BD for spinner highlights -->
         <item name="colorAccent">@color/accent</item> <!-- #FF5722 for selection -->

@@ -5,5 +5,4 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.Prvoir_Planner" parent="Base.Theme.Prvoir_Planner" />
 </resources>

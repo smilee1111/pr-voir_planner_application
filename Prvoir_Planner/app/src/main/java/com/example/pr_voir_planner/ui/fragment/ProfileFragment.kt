@@ -1,6 +1,7 @@
 package com.example.pr_voir_planner.ui.fragment
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,7 +20,7 @@ class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(
@@ -45,6 +46,8 @@ class ProfileFragment : Fragment() {
                 if (success) {
                     // Navigate to the login screen or show a success message
                     val intent = Intent(requireContext(), LoginActivity::class.java)
+                    // Kotlin
+                    sharedPreferences.edit().putBoolean("is_logged_in", false).apply()
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     requireActivity().finish()
