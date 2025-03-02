@@ -34,33 +34,52 @@ class ScheduleFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_schedule, container, false)
 
+        // Initialize views
         calendarView = view.findViewById(R.id.calendarView)
         eventRecyclerView = view.findViewById(R.id.eventRecyclerView)
         addEventFab = view.findViewById(R.id.addEventFab)
 
+        // Initialize Firebase Database
         database = FirebaseDatabase.getInstance().getReference("Events")
 
+        // Setup RecyclerView
         eventAdapter = EventAdapter(eventList)
         eventRecyclerView.adapter = eventAdapter
         eventRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Get selected date
+        // Set initial selected date (today's date)
+        selectedDate = getCurrentDate()
+        loadEvents(selectedDate)
+
+        // Handle date selection
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             selectedDate = "$dayOfMonth-${month + 1}-$year"
-            loadEvents(selectedDate)
-            Log.d("ScheduleFragment", "Selected date: $selectedDate") // Add this log
+            Log.d("ScheduleFragment", "Selected date: $selectedDate")
             loadEvents(selectedDate)
         }
 
+        // Handle FAB click to add event
         addEventFab.setOnClickListener {
             val dialog = AddEventDialog(selectedDate) { event ->
-                saveEventToFirebase(event) // Now `event` is of type `EventModel`
+                saveEventToFirebase(event)
             }
             dialog.show(childFragmentManager, "AddEventDialog")
         }
 
-
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadEvents(selectedDate) // Reload events when fragment resumes
+    }
+
+    private fun getCurrentDate(): String {
+        val calendar = java.util.Calendar.getInstance()
+        val day = calendar.get(java.util.Calendar.DAY_OF_MONTH)
+        val month = calendar.get(java.util.Calendar.MONTH) + 1
+        val year = calendar.get(java.util.Calendar.YEAR)
+        return "$day-$month-$year"
     }
 
     private fun loadEvents(date: String) {
@@ -76,24 +95,18 @@ class ScheduleFragment : Fragment() {
                 eventList.clear()
                 for (eventSnapshot in snapshot.children) {
                     val event = eventSnapshot.getValue(EventModel::class.java)
-                    if (event != null && event.userId == currentUserId) { // Filter by userId
+                    if (event != null && event.userId == currentUserId) {
                         eventList.add(event)
                     }
                 }
-                eventAdapter.notifyDataSetChanged() // Refresh the RecyclerView
+                eventAdapter.notifyDataSetChanged() // Refresh RecyclerView
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("Firebase", "Failed to load events", error.toException())
+                Log.e("Firebase", "Failed to load events: ${error.message}")
             }
         })
     }
-
-    override fun onResume() {
-        super.onResume()
-        loadEvents(selectedDate) // Reload events when returning to the fragment
-    }
-
 
     private fun saveEventToFirebase(event: EventModel) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -103,12 +116,15 @@ class ScheduleFragment : Fragment() {
         }
 
         val eventId = database.push().key ?: return
-        val eventWithId = event.copy(eventId = eventId, userId = currentUserId) // Set eventId & userId
+        val eventWithId = event.copy(eventId = eventId, userId = currentUserId)
 
         database.child(eventId).setValue(eventWithId)
-            .addOnSuccessListener { loadEvents(event.date) }
-            .addOnFailureListener { Log.e("Firebase", "Failed to save event") }
+            .addOnSuccessListener {
+                Log.d("Firebase", "Event saved successfully")
+                loadEvents(event.date) // Reload events after saving
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Failed to save event: ${e.message}")
+            }
     }
-
-
 }
