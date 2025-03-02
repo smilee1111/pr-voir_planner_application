@@ -19,7 +19,8 @@ import java.util.*
 
 class AddTaskDialog(
     private val selectedDate: String,
-    private val onTaskAdded: (TaskModel) -> Unit
+    private val taskToEdit: TaskModel? = null, // Optional parameter for editing
+    private val onTaskSubmitted: (TaskModel) -> Unit // Changed name to reflect both add/edit
 ) : DialogFragment() {
 
     private var selectedTime: String? = null // Nullable to handle uninitialized state
@@ -55,8 +56,21 @@ class AddTaskDialog(
         }
         statusSpinner.adapter = statusAdapter
 
-        // Initialize due date display
-        dueDateTextView.text = "Date: $selectedDate\nTap to select time"
+        // Pre-fill fields if editing
+        taskToEdit?.let { task ->
+            titleInput.setText(task.title)
+            descriptionInput.setText(task.description)
+            selectedTime = task.time
+            dueDateTextView.text = "Date: ${task.date}\nTime: ${task.time}"
+            // Set spinner selections
+            val priorityPosition = priorityAdapter.getPosition(task.priority)
+            prioritySpinner.setSelection(priorityPosition)
+            val statusPosition = statusAdapter.getPosition(task.status)
+            statusSpinner.setSelection(statusPosition)
+        } ?: run {
+            // Initialize due date display for adding new task
+            dueDateTextView.text = "Date: $selectedDate\nTap to select time"
+        }
 
         // Time Picker functionality
         val calendar = Calendar.getInstance()
@@ -76,7 +90,7 @@ class AddTaskDialog(
             ).show()
         }
 
-        // Handle Save button click directly (replacing setPositiveButton)
+        // Handle Save button click
         saveButton.setOnClickListener {
             // Validate inputs
             val title = titleInput.text.toString().trim()
@@ -91,6 +105,8 @@ class AddTaskDialog(
                 }
                 else -> {
                     val task = TaskModel(
+                        taskId = taskToEdit?.taskId ?: "", // Preserve original ID if editing
+                        userId = taskToEdit?.userId ?: "", // Preserve userId if editing
                         title = title,
                         description = description,
                         date = selectedDate,
@@ -98,18 +114,18 @@ class AddTaskDialog(
                         status = statusSpinner.selectedItem.toString(),
                         priority = prioritySpinner.selectedItem.toString()
                     )
-                    onTaskAdded(task)
+                    onTaskSubmitted(task)
                     dismiss() // Close the dialog on success
                 }
             }
         }
 
-        // Build the dialog without default buttons since we use the MaterialButton
+        // Build the dialog
         builder.setView(view)
+            .setTitle(if (taskToEdit != null) "Edit Task" else "Add Task") // Dynamic title
             .setNegativeButton("Cancel") { _, _ -> dismiss() }
 
         return builder.create().apply {
-            // Optional: Customize dialog appearance
             setOnShowListener {
                 getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.primary)

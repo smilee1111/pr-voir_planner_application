@@ -15,7 +15,9 @@ class TaskViewModel(private val repo: TaskRepository) : ViewModel() {
     fun getTasksForUserAndDate(userId: String, date: String, callback: (Boolean, List<TaskModel>?, String) -> Unit) {
         repo.getTasksForUserAndDate(userId, date, callback)
     }
-
+    fun updateTask(task: TaskModel, callback: (Boolean, String) -> Unit) { // Added
+        repo.updateTask(task, callback)
+    }
     fun getTasksForUser(userId: String): LiveData<List<TaskModel>> {
         return repo.getTasksForUser(userId)
     }

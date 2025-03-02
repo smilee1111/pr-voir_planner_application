@@ -22,9 +22,7 @@ class TaskRepositoryImpl : TaskRepository {
                     val tasks = mutableListOf<TaskModel>()
                     for (taskSnapshot in snapshot.children) {
                         val task = taskSnapshot.getValue(TaskModel::class.java)
-                        if (task != null) {
-                            tasks.add(task)
-                        }
+                        task?.let { tasks.add(it) }
                     }
                     tasksLiveData.value = tasks
                 }
@@ -54,6 +52,20 @@ class TaskRepositoryImpl : TaskRepository {
             }
     }
 
+    // New method for updating an existing task
+    override fun updateTask(task: TaskModel, callback: (Boolean, String) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return callback(false, "User not authenticated")
+        val taskId = task.taskId ?: return callback(false, "Task ID is missing")
+
+        database.child("tasks").child(userId).child(taskId).setValue(task)
+            .addOnSuccessListener {
+                callback(true, "Task updated successfully")
+            }
+            .addOnFailureListener { e ->
+                callback(false, e.message ?: "Failed to update task")
+            }
+    }
+
     override fun getTasksForUserAndDate(userId: String, date: String, callback: (Boolean, List<TaskModel>?, String) -> Unit) {
         database.child("tasks").child(userId)
             .orderByChild("date")
@@ -63,9 +75,7 @@ class TaskRepositoryImpl : TaskRepository {
                     val tasks = mutableListOf<TaskModel>()
                     for (taskSnapshot in snapshot.children) {
                         val task = taskSnapshot.getValue(TaskModel::class.java)
-                        if (task != null) {
-                            tasks.add(task)
-                        }
+                        task?.let { tasks.add(it) }
                     }
                     callback(true, tasks, "Tasks fetched successfully")
                 }

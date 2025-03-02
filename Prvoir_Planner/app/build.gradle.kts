@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore.ktx)
+    implementation ("androidx.cardview:cardview:1.0.0")
 
     implementation ("androidx.fragment:fragment-ktx:1.6.2")
     testImplementation(libs.junit)

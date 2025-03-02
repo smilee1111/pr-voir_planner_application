@@ -7,10 +7,10 @@ import com.google.firebase.auth.FirebaseUser
 
 
 interface TaskRepository {
-    fun addTask(task: TaskModel, callback: (Boolean, String) -> Unit)
-    fun getTasksForUserAndDate(userId: String, date: String, callback: (Boolean, List<TaskModel>?, String) -> Unit)
-    fun deleteTask(taskId: String, callback: (Boolean, String) -> Unit)
     fun getTasksForUser(userId: String): LiveData<List<TaskModel>>
     fun getCurrentUser(): FirebaseUser?
+    fun addTask(task: TaskModel, callback: (Boolean, String) -> Unit)
+    fun updateTask(task: TaskModel, callback: (Boolean, String) -> Unit) // Added
+    fun getTasksForUserAndDate(userId: String, date: String, callback: (Boolean, List<TaskModel>?, String) -> Unit)
+    fun deleteTask(taskId: String, callback: (Boolean, String) -> Unit)
 }
-

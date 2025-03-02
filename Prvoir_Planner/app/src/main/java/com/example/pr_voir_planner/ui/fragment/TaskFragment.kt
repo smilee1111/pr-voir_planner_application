@@ -1,7 +1,6 @@
 package com.example.pr_voir_planner.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,33 +41,31 @@ class TaskFragment : Fragment() {
         taskRecyclerView = view.findViewById(R.id.taskRecyclerView)
         addTaskFab = view.findViewById(R.id.addTaskFab)
 
-        // Initialize TaskRepository
         val taskRepository = TaskRepositoryImpl()
-        // Use TaskViewModelFactory to create the ViewModel instance
         taskViewModel = ViewModelProvider(
             this,
             TaskViewModelFactory(taskRepository)
         ).get(TaskViewModel::class.java)
 
-        taskAdapter = TaskAdapter(taskList)
+        taskAdapter = TaskAdapter(
+            taskList,
+            onEditClick = { task -> showEditTaskDialog(task) },
+            onDeleteClick = { task -> deleteTask(task) }
+        )
         taskRecyclerView.adapter = taskAdapter
         taskRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Initialize selectedDate with the current date
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-        selectedDate = "$year-${month + 1}-$dayOfMonth" // Format: YYYY-MM-DD
+        selectedDate = "$year-${month + 1}-$dayOfMonth"
 
-        // Set the calendar to the current date
         calendarView.date = calendar.timeInMillis
-
-        // Load tasks for the current date
         loadTasksForDate(selectedDate)
 
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            selectedDate = "$year-${month + 1}-$dayOfMonth" // Format: YYYY-MM-DD
+            selectedDate = "$year-${month + 1}-$dayOfMonth"
             loadTasksForDate(selectedDate)
         }
 
@@ -76,8 +73,8 @@ class TaskFragment : Fragment() {
             val dialog = AddTaskDialog(selectedDate) { task ->
                 taskViewModel.addTask(task) { success, message ->
                     if (success) {
-                        // Reload tasks for the selected date after adding a new task
                         loadTasksForDate(selectedDate)
+                        Toast.makeText(requireContext(), "Task added successfully", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     }
@@ -100,10 +97,37 @@ class TaskFragment : Fragment() {
             if (success) {
                 taskList.clear()
                 taskList.addAll(tasks ?: emptyList())
-                taskAdapter.notifyDataSetChanged() // Notify the adapter of data changes
+                taskAdapter.notifyDataSetChanged()
             } else {
                 Toast.makeText(requireContext(), "Failed to load tasks: $message", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun showEditTaskDialog(task: TaskModel) {
+        val dialog = AddTaskDialog(selectedDate, task) { updatedTask ->
+            taskViewModel.updateTask(updatedTask) { success, message -> // Changed to updateTask
+                if (success) {
+                    loadTasksForDate(selectedDate)
+                    Toast.makeText(requireContext(), "Task updated successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        dialog.show(childFragmentManager, "EditTaskDialog")
+    }
+
+    private fun deleteTask(task: TaskModel) {
+        task.taskId?.let { taskId ->
+            taskViewModel.deleteTask(taskId) { success, message ->
+                if (success) {
+                    loadTasksForDate(selectedDate)
+                    Toast.makeText(requireContext(), "Task deleted successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        } ?: Toast.makeText(requireContext(), "Task ID not found", Toast.LENGTH_SHORT).show()
     }
 }
